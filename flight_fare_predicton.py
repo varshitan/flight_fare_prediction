@@ -56,3 +56,14 @@ data['Journey_month'] = data['Date_of_Journey'].dt.month
 data['Journey_year'] = data['Date_of_Journey'].dt.year
 # Reading the data
 print(data.head(2))
+# Now converting he time feature t  hours, mins
+def extract_hour_min(df , col):
+    df[col +'_hour'] = df[col].dt.hour
+    df[col + '_minute'] = df[col].dt.minute
+    return df.head()
+print(extract_hour_min(data , 'Dep_Time'))
+print(extract_hour_min(data , 'Arrival_Time'))
+# After extrating these features we can drop the previous columnssince the all contains the sameinfo butin dfferent columns and types
+cols_to_drop = ['Arrival_Time' , 'Dep_Time']
+data.drop(cols_to_drop, axis =1 , inplace = True)
+data.head()
