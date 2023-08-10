@@ -149,11 +149,21 @@ plt.show()
 cat_col  = [col for col in data.columns if data[col].dtype == 'object']
 num_col  = [col for col in data.columns if data[col].dtype != 'object']
 
-for sub_category in data['source'].unique():
-    data['Source_'+ sub_category] = data['source'].apply(lambda x :1 if x ==sub_category else 0)
+for sub_category in data['Source'].unique():
+    data['Source_'+ sub_category] = data['Source'].apply(lambda x :1 if x ==sub_category else 0)
 data.head(3)
+# performing target encoding on data
+# performing manual encoding on data
+print(data.groupby(['Airline'])['Price'].mean().sort_values())
 
+dict_airlines = {key:index for index , key in enumerate('Airlines' , 0)}
+data['Airline'].map(dict_airlines)
 
+data['Destination'].replace('New Delhi' , 'Delhi' , inplace=True)
+dest = data.groupby(['Destination'])['Price'].mean().sort_values().index
+dict_dest = {key:index for index , key in enumerate(dest , 0)}
+data['Destination'] = data['Destination'].map(dict_dest)
+print(data['Destination'])
 
 
 
