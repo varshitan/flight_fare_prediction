@@ -60,17 +60,14 @@ data['Journey_day'] = data['Date_of_Journey'].dt.day
 data['Journey_month'] = data['Date_of_Journey'].dt.month
 data['Journey_year'] = data['Date_of_Journey'].dt.year
 
-# Reading the data
-print(data.head(2))
-
 # Now converting the time feature to hours and minutes
 def extract_hour_min(df, col):
     df[col + '_hour'] = df[col].dt.hour
     df[col + '_minute'] = df[col].dt.minute
     return df
 
-print(extract_hour_min(data, 'Dep_Time'))
-print(extract_hour_min(data, 'Arrival_Time'))
+data = extract_hour_min(data, 'Dep_Time')
+data = extract_hour_min(data, 'Arrival_Time')
 
 # After extracting these features, we can drop the previous columns since they all contain the same info but in different columns and types
 cols_to_drop = ['Arrival_Time', 'Dep_Time']
@@ -80,7 +77,7 @@ data.drop(cols_to_drop, axis=1, inplace=True)
 
 # Let's analyze in which time most of the flights take off
 def flight_dep_time(x):
-    if (x <= 4) and (x <= 8):
+    if (x >= 4) and (x <= 8):
         return 'Early morning'
     elif (x > 8) and (x <= 12):
         return 'Morning'
@@ -88,39 +85,58 @@ def flight_dep_time(x):
         return 'Noon'
     elif (x > 16) and (x <= 20):
         return 'Evening'
-    elif (x > 20) and (x <= 2):
+    elif (x > 20) or (x <= 2):
         return 'Night'
     else:
         return 'Late night'
 
-# To know the number of flights we use the value count method to it
 data['Dep_Time_Hour_category'] = data['Dep_Time_hour'].apply(flight_dep_time)
 flight_counts = data['Dep_Time_Hour_category'].value_counts()
 
-print(flight_counts)
-# plotting the flght counts for better understanding of data
-
-
-# To make graphs itnteractive we use plotly
-
-plt.bar(flight_counts.index, flight_counts, color='blue')
+# Plotting the flight counts for better understanding of data
+plt.figure(figsize=(10, 6))
+sns.barplot(x=flight_counts.index, y=flight_counts.values, color='blue')
 plt.xlabel('Departure Time Category')
 plt.ylabel('Number of Flights')
 plt.title('Number of Flights by Departure Time Category')
 plt.xticks(rotation=45)
 plt.show()
 
-def pre_Process_duration (x):
-    if 'h'not in x:
-        x= '0h'+ '' +x
-    elif 'm' not in x:
-        x  = x + ''+'0m'
+# Corrected the code above for plotting the bar chart
+
+def pre_process_duration(x):
+    if 'h' not in x:
+        x = '0h' + x
+    if 'm' not in x:
+        x = x + '0m'
     return x
 
-data['Duration']= data['Duration'].apply(pre_Process_duration)
-print(data['Duration'])
-data['Duration_hours']= data['Duration'].apply(lambda x :int(x.split('')[0][0:-1]))
-data['Duration_mins']= data['Duration'].apply(lambda x :int(x.split('')[1][0:-1]))
-    
+data['Duration'] = data['Duration'].apply(pre_process_duration)
 
+def extract_duration_in_minutes(duration_str):
+    parts = duration_str.split()
+    hours = 0
+    mins = 0
+    for part in parts:
+        if 'h' in part:
+            hours = int(part.split('h')[0])
+        elif 'm' in part:
+            mins = int(part.split('m')[0])
+    total_minutes = hours * 60 + mins
+    return total_minutes
 
+data['Duration_total_mins'] = data['Duration'].apply(extract_duration_in_minutes)
+
+# Creating a scatter plot
+plt.figure(figsize=(10, 6))
+sns.scatterplot(x='Duration_total_mins', y='Price', data=data)
+plt.xlabel('Total Duration (minutes)')
+plt.ylabel('Price')
+plt.title('Scatter Plot of Flight Duration vs Price')
+plt.show()
+
+sns.scatterplot(x= 'Duration_total_mins', y = 'Price', hue='Total_Stops', data=data)
+plt.show()
+# from regression plot we cn understand thatas duratin increases price is also inceased
+sns.lmplot(x='Duration_total_mins', y='Price', data=data)
+plt.show()
