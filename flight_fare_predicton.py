@@ -140,3 +140,9 @@ plt.show()
 # from regression plot we cn understand thatas duratin increases price is also inceased
 sns.lmplot(x='Duration_total_mins', y='Price', data=data)
 plt.show()
+#1. on whiich routejet airways is used
+# 2. airline vs price analysis
+print(data[data['Airline'] == 'JetAirways'].groupby('Route').size().sort_values(ascending=False))
+
+sns.boxplot(y= 'Price',x= 'Airline',data=data)
+plt.show()
