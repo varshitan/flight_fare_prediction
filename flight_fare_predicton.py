@@ -110,3 +110,17 @@ plt.title('Number of Flights by Departure Time Category')
 plt.xticks(rotation=45)
 plt.show()
 
+def pre_Process_duration (x):
+    if 'h'not in x:
+        x= '0h'+ '' +x
+    elif 'm' not in x:
+        x  = x + ''+'0m'
+    return x
+
+data['Duration']= data['Duration'].apply(pre_Process_duration)
+print(data['Duration'])
+data['Duration_hours']= data['Duration'].apply(lambda x :int(x.split('')[0][0:-1]))
+data['Duration_mins']= data['Duration'].apply(lambda x :int(x.split('')[1][0:-1]))
+    
+
+
