@@ -102,8 +102,6 @@ plt.title('Number of Flights by Departure Time Category')
 plt.xticks(rotation=45)
 plt.show()
 
-# Corrected the code above for plotting the bar chart
-
 def pre_process_duration(x):
     if 'h' not in x:
         x = '0h' + x
@@ -146,3 +144,19 @@ print(data[data['Airline'] == 'JetAirways'].groupby('Route').size().sort_values(
 
 sns.boxplot(y= 'Price',x= 'Airline',data=data)
 plt.show()
+
+# applyng one-hot on data i.e feature engineering (converting categorical values to numeric values so that machine can understand and interpret it)
+cat_col  = [col for col in data.columns if data[col].dtype == 'object']
+num_col  = [col for col in data.columns if data[col].dtype != 'object']
+
+for sub_category in data['source'].unique():
+    data['Source_'+ sub_category] = data['source'].apply(lambda x :1 if x ==sub_category else 0)
+data.head(3)
+
+
+
+
+
+
+
+
